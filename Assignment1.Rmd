@@ -46,21 +46,21 @@ ggplot(clim_rain, aes(y = rain, x = year))+
   theme_bw()+
   scale_x_continuous(breaks=seq(1942, 2016, by = 10))+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
-  ylab("Precipitation")+
+  ylab("Total Annual Precipitation")+
   xlab("Year")
 ```
 
 #####Based on the above, the wettest years were 1982, 1969, 1983, and 1996. The driest years were 2013, 1947, 2016, and 1976. 
 
 ###Wet and dry years along the California Coast: Big Sur, California
-<div align="center">
+
 <img src="Big_Sur_wet.jpg" height=800>
 
-<div align="center">
 <img src="Big_Sur_dry.jpg" height=800>
 
+
 ###Wet and dry seasons
-```{r clim_season, eval = TRUE, echo=true}
+```{r clim_season, eval = TRUE, echo=FALSE}
 climate["season"] <- NA
 climate$season[climate$month==3]= 1
 climate$season[climate$month==4]= 1
@@ -74,7 +74,9 @@ climate$season[climate$month==11]= 3
 climate$season[climate$month==12]= 4
 climate$season[climate$month==1]= 4
 climate$season[climate$month==2]= 4
+```
 
+``` {r clim_season2, eval = TRUE, echo=TRUE}
 clim_season <- aggregate(rain~season+month+day, data = climate, FUN = sum)
 ggplot(clim_season, aes(group=season, x = season, y = rain)) +
   geom_boxplot(fill = "cyan") +
@@ -85,5 +87,21 @@ ggplot(clim_season, aes(group=season, x = season, y = rain)) +
 ```
 
 ##Winter Precipitation and Summer Temperature
+``` {r clim_season_temp, eval= TRUE, echo = FALSE}
+seasonal_rain <- aggregate(rain~year+season, data = climate, FUN = sum)
+winter_rain<- subset(seasonal_rain, season == 4)
+season_temp <- aggregate(tmax~year+season, data = climate, FUN = mean)
+summer_temp <- subset(season_temp, season == 2)
+rain_temp <- merge(summer_temp, winter_rain, by = "year")
+```
 
-
+####Plot showing relationship between winter precipitation and summer temperature
+``` {r clim_seasontemp, eval = TRUE, echo=TRUE}
+Rain_temp_plot<- ggplot(rain_temp, aes(x=rain, y= tmaxl)) +
+  geom_point(size=0.8)+
+  geom_smooth(method=lm, se = TRUE, formula = y ~ x, color = "grey", size = 0.5)+
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  xlab("Total Winter Precipitation")+
+  ylab("Mean Temperature")
+```
