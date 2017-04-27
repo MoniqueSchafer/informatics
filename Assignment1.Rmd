@@ -1,0 +1,89 @@
+---
+title: 'ESM 262 Assignment: Evaluating Climate'
+author: "Monique Schafer"
+date: "4/26/2017"
+output: html_document
+---
+
+## Monthly precipitation
+
+```{r climate, eval=TRUE, echo=TRUE}
+library(ggplot2)
+climate <- read.table("clim.txt", header=T)
+climate$date <- NULL
+clim_month <- aggregate(rain~month+day, data = climate, FUN = sum)
+ggplot(clim_month, aes(group=month, x = month, y = rain)) +
+  geom_boxplot(fill = "cyan") +
+  scale_y_continuous(name = "Average Monthly Precipitation") +
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(name = "Month", breaks = c(1,2,3,4,5,6,7,8,9,10,11,12))
+```
+
+## Monthly temperatures
+
+```{r clim_temp, eval=TRUE, echo=TRUE}
+clim_temp_min <- aggregate(tmin~month+day, data = climate, FUN = mean)
+clim_temp_max <- aggregate(tmax~month+day, data = climate, FUN = mean)
+clim_temp <- merge(clim_temp_max, clim_temp_min)
+
+ggplot(clim_temp, aes(group= month, x = month)) +
+  geom_boxplot(aes(y=tmax), fill = "orange") +
+  geom_boxplot(aes(y=tmin), fill = "lightskyblue1") +
+  scale_y_continuous(name = "Average Min and Max Temperatures (C)") +
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(name = "Month", breaks = c(1,2,3,4,5,6,7,8,9,10,11,12))
+
+```
+
+
+## Calculating wet and dry years
+```{r clim_rain, eval=TRUE, echo=TRUE}
+clim_rain <- aggregate(rain~year, data = climate, FUN = sum)
+ggplot(clim_rain, aes(y = rain, x = year))+
+  geom_line(stat = "identity", color = "blue") +
+  theme_bw()+
+  scale_x_continuous(breaks=seq(1942, 2016, by = 10))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  ylab("Precipitation")+
+  xlab("Year")
+```
+
+#####Based on the above, the wettest years were 1982, 1969, 1983, and 1996. The driest years were 2013, 1947, 2016, and 1976. 
+
+###Wet and dry years along the California Coast: Big Sur, California
+<div align="center">
+<img src="Big_Sur_wet.jpg" height=800>
+
+<div align="center">
+<img src="Big_Sur_dry.jpg" height=800>
+
+###Wet and dry seasons
+```{r clim_season, eval = TRUE, echo=true}
+climate["season"] <- NA
+climate$season[climate$month==3]= 1
+climate$season[climate$month==4]= 1
+climate$season[climate$month==5]= 1
+climate$season[climate$month==6]= 2
+climate$season[climate$month==7]= 2
+climate$season[climate$month==8]= 2
+climate$season[climate$month==9]= 3
+climate$season[climate$month==10]= 3
+climate$season[climate$month==11]= 3
+climate$season[climate$month==12]= 4
+climate$season[climate$month==1]= 4
+climate$season[climate$month==2]= 4
+
+clim_season <- aggregate(rain~season+month+day, data = climate, FUN = sum)
+ggplot(clim_season, aes(group=season, x = season, y = rain)) +
+  geom_boxplot(fill = "cyan") +
+  scale_y_continuous(name = "Precipitation") +
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(name = "Season", breaks = c(1,2,3,4))
+```
+
+##Winter Precipitation and Summer Temperature
+
+
