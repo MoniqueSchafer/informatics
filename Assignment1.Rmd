@@ -1,8 +1,9 @@
 ---
-title: 'ESM 262 Assignment: Evaluating Climate'
+title: 'ESM 262 Assignment 1: Evaluating Climate'
 author: "Monique Schafer"
 date: "4/26/2017"
-output: html_document
+output:
+  html_document: default
 ---
 
 ## Monthly precipitation
@@ -95,7 +96,7 @@ summer_temp <- subset(season_temp, season == 2)
 rain_temp <- merge(summer_temp, winter_rain, by = "year")
 ```
 
-####Plot showing relationship between winter precipitation and summer temperature
+###Plot showing relationship between winter precipitation and summer temperature
 ``` {r clim_seasontemp, eval = TRUE, echo=TRUE}
 ggplot(rain_temp, aes(x=rain, y= tmax)) +
   geom_point(size=0.8)+
@@ -104,4 +105,9 @@ ggplot(rain_temp, aes(x=rain, y= tmax)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   xlab("Total Winter Precipitation")+
   ylab("Mean Temperature")
+
+linear_reg <-lm(rain ~ tmax, data=rain_temp)
+summary(linear_reg)
+
 ```
+######Graph above shows the relationship between winter precipitation and summer temperature. 
