@@ -3,6 +3,7 @@ title: 'ESM 262 Assignment 1: Evaluating Climate'
 author: "Monique Schafer"
 date: "4/26/2017"
 output:
+  pdf_document: default
   html_document: default
 ---
 
