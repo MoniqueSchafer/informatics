@@ -1,5 +1,5 @@
 ---
-title: "Informatics1"
+title: "Informatics Test"
 author: "Monique Schafer"
 date: "4/24/2017"
 output: html_document
@@ -11,18 +11,41 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-This is my R Markdown document. 
+**This is my practice R Markdown document.** 
 
-```{r cars}
-summary(cars)
+*Item 1*
+*Item 2*
+*Item 3*
+*Item 4*
+
+## Including Images
+
+<div align="center">
+<img src="SeaOtter.jpg" height=800>
+
+##Include link
+[Sea Otter](https://en.wikipedia.org/wiki/Sea_otter)
+
+#Including Equations
+## Equations in Rmarkdown - Chunk
+
+Surround math in **$** symbols
+
+Uses [Latex](https://en.wikibooks.org/wiki/LaTeX) markup language for equations as input. 
+
+Some nice examples of commonly used greek symbols and functions
+[more latex](http://www.calvin.edu/~rpruim/courses/m343/F12/RStudio/LatexExamples.html)
+
+$$
+\frac{1}{n} \sum_{i=i}^{n} x_{i}
+$$
+``` {r testcode, eval = TRUE, echo = TRUE}
+tmp = seq(from=1,to=10)
+plot(tmp)
 ```
 
-## Including Plots
+#inline code in R
+The circumfrence of a circle is $\pi$ times R**2
 
-You can also embed plots, for example:
+* for a radius of 4 we get `r pi*4**2`
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
