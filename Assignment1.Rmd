@@ -3,16 +3,16 @@ title: 'ESM 262 Assignment 1: Evaluating Climate'
 author: "Monique Schafer"
 date: "4/26/2017"
 output:
+  pdf_document: default
   html_document: default
 ---
 
-## Monthly precipitation
-
+##Monthly precipitation
 ```{r climate, eval=TRUE, echo=TRUE}
 library(ggplot2)
 climate <- read.table("clim.txt", header=T)
 climate$date <- NULL
-clim_month <- aggregate(rain~month+day, data = climate, FUN = sum)
+clim_month <- aggregate(rain~year+month, data = climate, FUN = sum)
 ggplot(clim_month, aes(group=month, x = month, y = rain)) +
   geom_boxplot(fill = "cyan") +
   scale_y_continuous(name = "Total Monthly Precipitation") +
@@ -21,11 +21,12 @@ ggplot(clim_month, aes(group=month, x = month, y = rain)) +
   scale_x_continuous(name = "Month", breaks = c(1,2,3,4,5,6,7,8,9,10,11,12))
 ```
 
-## Monthly temperatures
+#####Figure 1. Boxplot of average monthly precipitation based on data from years 1942-2016. 
 
+##Monthly temperatures
 ```{r clim_temp, eval=TRUE, echo=TRUE}
-clim_temp_min <- aggregate(tmin~month+day, data = climate, FUN = mean)
-clim_temp_max <- aggregate(tmax~month+day, data = climate, FUN = mean)
+clim_temp_min <- aggregate(tmin~month+year, data = climate, FUN = mean)
+clim_temp_max <- aggregate(tmax~month+year, data = climate, FUN = mean)
 clim_temp <- merge(clim_temp_max, clim_temp_min)
 
 ggplot(clim_temp, aes(group= month, x = month)) +
@@ -38,57 +39,49 @@ ggplot(clim_temp, aes(group= month, x = month)) +
 
 ```
 
+#####Figure 2. Shows average monthly temperatures (&deg;C), where average highs are shown in orange, and lows shown in blue. 
 
-## Calculating wet and dry years
+##Calculating wet and dry years
 ```{r clim_rain, eval=TRUE, echo=TRUE}
 clim_rain <- aggregate(rain~year, data = climate, FUN = sum)
 ggplot(clim_rain, aes(y = rain, x = year))+
-  geom_line(stat = "identity", color = "blue") +
+  geom_line(stat = "identity", color = "blue", size = 0.5) +
   theme_bw()+
-  scale_x_continuous(breaks=seq(1942, 2016, by = 10))+
+  scale_x_continuous(breaks=seq(1940, 2020, by = 5))+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   ylab("Total Annual Precipitation")+
   xlab("Year")
 ```
 
+#####Figure 3.Time series of annual precipitation spanning from 1942-2016
+
 #####Based on the above, the wettest years were 1982, 1969, 1983, and 1996. The driest years were 2013, 1947, 2016, and 1976. 
 
-###Wet and dry years along the California Coast: Big Sur, California
-
+##Wet and dry years along the California Coast: Big Sur, California
 <img src="Big_Sur_wet.jpg" height=800>
-
 <img src="Big_Sur_dry.jpg" height=800>
-
 
 ###Wet and dry seasons
 ```{r clim_season, eval = TRUE, echo=FALSE}
-climate["season"] <- NA
-climate$season[climate$month==3]= 1
-climate$season[climate$month==4]= 1
-climate$season[climate$month==5]= 1
-climate$season[climate$month==6]= 2
-climate$season[climate$month==7]= 2
-climate$season[climate$month==8]= 2
-climate$season[climate$month==9]= 3
-climate$season[climate$month==10]= 3
-climate$season[climate$month==11]= 3
-climate$season[climate$month==12]= 4
-climate$season[climate$month==1]= 4
-climate$season[climate$month==2]= 4
+range(climate$month)
+climate$season = ifelse(climate$month %in% c(3,4,5),"1", ifelse(climate$month%in% c(6,7,8),"2", ifelse(climate$month %in% c(9,10,11),"3", "4")))
 ```
 
 ``` {r clim_season2, eval = TRUE, echo=TRUE}
-clim_season <- aggregate(rain~season+month+day, data = climate, FUN = sum)
+clim_season <- aggregate(rain~season+month+year, data = climate, FUN = sum)
 ggplot(clim_season, aes(group=season, x = season, y = rain)) +
   geom_boxplot(fill = "cyan") +
   scale_y_continuous(name = "Precipitation") +
   theme_bw()+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
-  scale_x_continuous(name = "Season", breaks = c(1,2,3,4))
+  scale_x_discrete(name = "Season")
 ```
 
+#####Figure 4. Seasonal precipitation where 1 represents spring, 2 summer, 3 fall, and 4 winter. Spring is months March-May, summer months June-August, fall months September-November, and winter months December-February. 
+
+
 ##Winter Precipitation and Summer Temperature
-``` {r clim_season_temp, eval= TRUE, echo = FALSE}
+```{r clim_season3, eval= TRUE, echo = TRUE}
 seasonal_rain <- aggregate(rain~year+season, data = climate, FUN = sum)
 winter_rain<- subset(seasonal_rain, season == 4)
 season_temp <- aggregate(tmax~year+season, data = climate, FUN = mean)
@@ -96,18 +89,21 @@ summer_temp <- subset(season_temp, season == 2)
 rain_temp <- merge(summer_temp, winter_rain, by = "year")
 ```
 
-###Plot showing relationship between winter precipitation and summer temperature
+
 ``` {r clim_seasontemp, eval = TRUE, echo=TRUE}
-ggplot(rain_temp, aes(x=rain, y= tmax)) +
+ggplot(rain_temp, aes(x=rain, y= tmax, group_by(year))) +
   geom_point(size=0.8)+
-  geom_smooth(method=lm, se = TRUE, formula = y ~ x, color = "grey", size = 0.5)+
+  geom_smooth(method=lm, se = FALSE, formula = y ~ x, color = "blue", size = 0.5)+
   theme_bw()+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   xlab("Total Winter Precipitation")+
   ylab("Mean Temperature")
+```
 
+###Plot showing relationship between winter precipitation and summer temperature
+```{r linear_reg, eval - TRUE, echo=TRUE}
 linear_reg <-lm(rain ~ tmax, data=rain_temp)
 summary(linear_reg)
-
 ```
-######Graph above shows the relationship between winter precipitation and summer temperature. 
+
+#####The relationship between winter precipitation and summer temperature might be useful to know because while the above relationship is not significant there is a slightly negative relationship between winter precipitation and summer temperatures. This may be important particularly in dry years, as warmer temperatures and dry conditions may lead to a significant fire season. 
