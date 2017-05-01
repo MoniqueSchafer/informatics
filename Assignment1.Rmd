@@ -3,9 +3,9 @@ title: 'ESM 262 Assignment 1: Evaluating Climate'
 author: "Monique Schafer"
 date: "4/26/2017"
 output:
-  pdf_document: default
   ioslides_presentation: default
   html_document: default
+  pdf_document: default
 ---
 
 ##Monthly precipitation
@@ -59,11 +59,11 @@ ggplot(clim_rain, aes(y = rain, x = year))+
 #####Based on the above, the wettest years were 1982, 1969, 1983, and 1996. The driest years were 2013, 1947, 2016, and 1976. 
 
 ##Wet and dry years along the California Coast: Big Sur, California
-<img src="Big_Sur_wet.jpg" height=800>
-<img src="Big_Sur_dry.jpg" height=800>
+![Wet Year](Big_Sur_wet.jpg)
+![Dry Year](Big_Sur_dry.jpg)
 
 ###Wet and dry seasons
-```{r clim_season, eval = TRUE, echo=FALSE}
+```{r clim_season, eval = TRUE, echo=TRUE}
 range(climate$month)
 climate$season = ifelse(climate$month %in% c(3,4,5),"1", ifelse(climate$month%in% c(6,7,8),"2", ifelse(climate$month %in% c(9,10,11),"3", "4")))
 ```
