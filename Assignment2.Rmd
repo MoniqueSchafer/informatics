@@ -1,0 +1,64 @@
+---
+title: 'Assignment 2: Data Ingest'
+author: "Monique Schafer"
+date: "5/9/2017"
+output: html_document
+---
+
+###Part 1: Importing and Tidying Data
+#####Loading neccessary packages and importing data
+######Note: Columns were assigned appropriate type in this step
+```{r gazateer, include=TRUE, echo=TRUE}
+library(tidyverse)
+gaz_raw <- read_delim("CA_Features_20170401.txt", delim = "|", col_types = cols(
+  FEATURE_ID = col_character(),
+  DATE_CREATED = col_date(format = "%m/%d/%Y"),
+  DATE_EDITED = col_date(format = "%m/%d/%Y")
+))
+```
+
+#####Selecting columns
+```{r gaz, include=TRUE, echo=TRUE}
+gaz <- select(gaz_raw, FEATURE_ID,FEATURE_NAME, FEATURE_CLASS, STATE_ALPHA, COUNTY_NAME, PRIM_LAT_DEC, PRIM_LONG_DEC,SOURCE_LAT_DEC,SOURCE_LONG_DEC,ELEV_IN_M,MAP_NAME, DATE_CREATED, DATE_EDITED)
+
+gaz[, 6:7][gaz[, 6:7] == 0] <- NA
+
+####Removing Unknown Rows and Selecting For California Features Only
+gaz <- gaz%>% filter(STATE_ALPHA == "CA") %>% 
+  filter(!is.na(PRIM_LAT_DEC)) %>%
+  filter(!is.na(PRIM_LONG_DEC))
+
+write_csv(gaz,"gaz.csv")
+```
+
+###Part 2: Analyzing the Gazateer Data
+##### What is the most-frequently-occurring feature name? What is the least-frequently-occuring feature class?
+```{r gazfeature, include=TRUE, echo=TRUE}
+feature_class <- count(gaz, vars = FEATURE_CLASS)
+print(feature_class)
+```
+######The most-frequently-occurring feature class is "locale", the least-frequently-occurring feature class is "isthmus" and "sea".
+
+#####What is the approximate center point of each county?
+``` {r gazcenterpoint, include=TRUE, echo=TRUE}
+gaz_countygeo <- gaz %>%
+  group_by(COUNTY_NAME) %>%
+  summarise(county_minlat = min(PRIM_LAT_DEC, na.rm = TRUE), 
+  county_maxlat = max(PRIM_LAT_DEC, na.rm = TRUE), county_minlong = max(PRIM_LONG_DEC, na.rm = TRUE), county_maxlong = min(PRIM_LONG_DEC, na.rm = TRUE)
+  )
+
+gaz_countymid <- transmute(gaz_countygeo,
+                        COUNTY_NAME = COUNTY_NAME,
+                        MID_LAT = (county_maxlat + county_minlat)/2,
+                        MID_LONG = (county_maxlong + county_minlong)/2
+)
+
+print(gaz_countymid[,1:3], caption = "Latitude and Longitude Midpoints") 
+```
+######The midpoints for each county are shown in the table above.
+
+#####What are the fractions of the total number of features in each county that are natural? Man-made?
+```{r gazmanmade, include=TRUE, echo=TRUE}
+NaturalMan <- 
+
+```
