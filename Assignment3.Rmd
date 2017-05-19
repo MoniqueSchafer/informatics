@@ -1,0 +1,108 @@
+---
+title: "Assignment 3"
+author: "Monique Schafer"
+date: "5/12/2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+##GGPlot and Graphics in R: Climate and Plant Data
+```{r packages, include=FALSE, echo=TRUE}
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+library(lubridate)
+library(Hmisc)
+```
+
+#####Loading Data
+```{r data, include=TRUE, echo=TRUE}
+thinshallow <- read.table("esm262/docs/wk04_ggplot/data/resthin.shallow.txt", header=T)
+thindeep <- read.table("esm262/docs/wk04_ggplot/data/resthin.deep.txt", header=T)
+clim <- read.table("esm262/docs/wk04_ggplot/data/sierraclim.txt", header=T)
+```
+
+###Plot 1
+```{r plot, include=TRUE, echo=TRUE}
+range(clim$month)
+clim$season = ifelse(clim$month %in% c(3,4,5),"Spring", ifelse(clim$month%in% c(6,7,8),"Summer", ifelse(clim$month %in% c(9,10,11),"Fall", "Winter")))
+
+ggplot(transform(clim, season = factor(season, levels = c("Spring", "Summer", "Fall", "Winter"))))+
+  geom_boxplot(aes(y=tmax, x=year, group = year, fill = season))+
+  facet_wrap(~season, ncol = 2)+
+  theme_bw()+
+  labs(x = "Year", y = expression("Temperature " ( degree*C)))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_fill_manual(values = c( "springgreen3", "brown2", "darkgoldenrod1","cyan3"))+
+  theme(legend.position = "none")
+```
+
+#####Figure 1. Seasonal temperatures through time in &deg;C. Notice following the year 2000, more variability exists in data, additionally summer months are hotter on average. Spring is March-May, summer is June-August, fall is September-November, and winter is December-February.
+
+###Plot 2
+```{r plot2, include=TRUE, echo=TRUE}
+thindeep$depth= "Deep"
+thinshallow$depth="Shallow"
+plants <- rbind(thindeep, thinshallow)
+
+evap <- ggplot(plants, aes(y=evap,x=month, group=depth, color = depth))+
+  stat_summary(fun.y="mean", geom="line")+
+  stat_summary(fun.y="mean", geom="point")+
+  scale_color_manual(values=c("#31a354", "#a1d99b"))+
+  theme_classic()+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(breaks = (1:12))+
+  labs(y= "Evaporation", x = "", col = "")+
+  theme(legend.position = c(0.8, 0.7))
+  
+trans<- ggplot(plants, aes(y=trans,x=month, group=depth, color = depth))+
+  stat_summary(fun.y="mean", geom="line")+
+  stat_summary(fun.y="mean", geom="point")+
+  theme_classic()+
+  scale_color_manual(values=c("#31a354", "#a1d99b"))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(breaks = (1:12))+
+  labs(y= "Transpiration", x = "", col = "")+
+  theme(legend.position = c(0.8, 0.7))
+
+precip <- ggplot(subset(clim, year %in% c(1950:1980)), aes(y=rain, x=month))+
+  stat_summary(fun.y="mean", geom="bar", fill = "darkslategray1")+
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1, color = "grey")+
+  theme_classic()+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(breaks = (1:12))+
+  labs(x="Month", y = "Precipitation")
+
+grid.arrange(evap, trans, precip, ncol = 1)
+```
+
+#####Figure 2. 30-year mean monthly evaporation, transpiration, and precipitation from 1950-1980. Error bars on bottom precipitation figure show +/- 1SE. 
+
+```{r plot3, include=TRUE, echo=TRUE}
+
+ggplot(plants, aes(x=month, y=plantc, col=as.factor(wy)))+ 
+  stat_summary(fun.y="mean", geom="line", aes(col=as.factor(wy)))+
+  facet_grid(~depth)+
+  theme_classic()+
+  labs(x="Month", y="Biomass", col = "Years Since \nThinning")+
+  scale_x_continuous(breaks = c(1:12))+
+  scale_color_brewer(type="div", palette="BrBG")
+
+```
+
+```{r plot4, include=TRUE, echo=TRUE}
+linreg <- lm(plants$psn >0 ~ plants$trans >0, data = plants)
+summary(linreg)
+
+ggplot(subset(plants, plants$trans >0 & plants$psn >0), aes(x=psn, y=trans))+
+  geom_point(aes(color=depth), shape=18, size=rel(1.5))+
+  geom_smooth(method="lm", formula= (y ~ x), se=TRUE, color = "grey") +
+  theme_classic()+
+  labs(y="Photosynthesis", x = "Transpiration", col= "")+
+  annotate("text", x=0.009, y=0.4, label="y=0.08x+0.635 \nR-squared = 0.003249 \np-value<0.005", colour="black", size=3, hjust=0)+
+  scale_color_manual(values = c("#31a354", "#7fcdbb"))+
+  theme(legend.position = c(.2,.9))
+```
+
+#####Figure 4. Relationship between transpiration and photosynthesis (for all positive values).
