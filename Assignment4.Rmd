@@ -1,7 +1,7 @@
 ---
 title: "Assignment 4"
 author: "Monique Schafer and Stephanie Gad"
-date: "5/22/2017"
+date: "5/24/2017"
 output: html_document
 ---
 
@@ -11,7 +11,7 @@ library(ggplot2)
 library(reshape2)
 ```
 
-## Example Data Generation
+###Fish Data Generation
 ```{r fish}
 species = as.factor(c("mahimahi", "halibut", "salmon", "cod", "albacore"))
 location = as.factor(c("pacific", "west_pac", "atlantic", "gulf"))
@@ -26,19 +26,14 @@ catch <- as.matrix(catch_tib)
 rownames(catch)=species
 colnames(catch)=location
 
-#Assign Price per Pound
+#Assign Price per Pound by Species 
 price = c(25, 22, 20, 23, 12)
+```
 
+
+###Fish Function Results
+``` {r fishyfunction}
 source("fish_function.R")
 fish_function(catch)
 ```
-
-###Calculating 
-```{r , echo=FALSE}
-
-
-
-
-```
-
 
