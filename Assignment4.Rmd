@@ -1,0 +1,44 @@
+---
+title: "Assignment 4"
+author: "Monique Schafer and Stephanie Gad"
+date: "5/22/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(reshape2)
+```
+
+## Example Data Generation
+```{r fish}
+species = as.factor(c("mahimahi", "halibut", "salmon", "cod", "albacore"))
+location = as.factor(c("pacific", "west_pac", "atlantic", "gulf"))
+
+catch_tib <- tibble(
+  pacific = c(100, 321, 254, 190, 500),
+  west_pac = c(500, 110, 0, 100, 950),
+  atlantic = c(200, 600, 250, 900, 400),
+  gulf = c(334, 160, 50, 430, 1000))
+
+catch <- as.matrix(catch_tib)
+rownames(catch)=species
+colnames(catch)=location
+
+#Assign Price per Pound
+price = c(25, 22, 20, 23, 12)
+
+source("fish_function.R")
+fish_function(catch)
+```
+
+###Calculating 
+```{r , echo=FALSE}
+
+
+
+
+```
+
+
