@@ -4,9 +4,11 @@ author: "Monique Schafer"
 date: "4/26/2017"
 output:
   ioslides_presentation: default
+  widescreen: true
   html_document: default
   pdf_document: default
 ---
+
 
 ##Monthly precipitation
 ```{r climate, eval=TRUE, echo=TRUE}
@@ -21,6 +23,7 @@ ggplot(clim_month, aes(group=month, x = month, y = rain)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   scale_x_continuous(name = "Month", breaks = c(1,2,3,4,5,6,7,8,9,10,11,12))
 ```
+
 
 #####Figure 1. Boxplot of average monthly precipitation based on data from years 1942-2016. 
 
@@ -79,7 +82,6 @@ ggplot(clim_season, aes(group=season, x = season, y = rain)) +
 ```
 
 #####Figure 4. Seasonal precipitation where 1 represents spring, 2 summer, 3 fall, and 4 winter. Spring is months March-May, summer months June-August, fall months September-November, and winter months December-February. 
-
 
 ##Winter Precipitation and Summer Temperature
 ```{r clim_season3, eval= TRUE, echo = TRUE}
